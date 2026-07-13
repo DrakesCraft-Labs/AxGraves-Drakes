@@ -48,10 +48,6 @@
                                     <shadedPattern>com.artillexstudios.axgraves.libs.axapi</shadedPattern>
                                 </relocation>
                                 <relocation>
-                                    <pattern>org.bstats</pattern>
-                                    <shadedPattern>com.artillexstudios.axgraves.libs.bstats</shadedPattern>
-                                </relocation>
-                                <relocation>
                                     <pattern>revxrsal.commands</pattern>
                                     <shadedPattern>com.artillexstudios.axgraves.libs.lamp</shadedPattern>
                                 </relocation>
@@ -107,12 +103,6 @@
             <artifactId>slf4j-api</artifactId>
             <version>2.0.17</version>
             <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.bstats</groupId>
-            <artifactId>bstats-bukkit</artifactId>
-            <version>3.2.1</version>
-            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.github.drakescraft_labs</groupId>

@@ -161,13 +161,6 @@ holograms:
   # should text have an outline?
   shadow: true
 
-# should be plugin notify you if there is a new update?
-update-notifier:
-  # if enabled, it will display the message in the console
-  enabled: false
-  # if enabled, it will broadcast the update message to all players who have the <plugin-name>.update-notify permission
-  on-join: false
-
 # prints out a lot of information about the plugin in the console
 # this can cause a lot of spam, only use if a developer asks you to
 debug: false

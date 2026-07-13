@@ -1,4 +1,7 @@
-# AxGraves
+# AxGraves Drake
+
+> Estado: preparado para Paper/Purpur 1.21.11 y Java 21. El artefacto se valida
+> localmente antes de cualquier ventana de despliegue.
 
 A Minecraft plugin that creates a death chest (grave) at the location where a player dies, so they can recover their items.
 
@@ -80,15 +83,26 @@ Requires **Java 21** on the server JVM.
   or via the `Soulbound Rune` lore flag) **are excluded** from the grave to prevent duplication.
   AxGraves works normally when Slimefun is absent.
 
+## Operaci\u00f3n Drake
+
+- La decisi\u00f3n de conservar un objeto Soulbound pertenece a Slimefun; AxGraves
+  excluye esos objetos de la tumba y restaura los casos pendientes al reconectar.
+  Esto evita que ambos sistemas entreguen el mismo objeto.
+- MoreGraves debe mantenerse deshabilitado antes de instalar este fork. No se
+  deben cargar dos plugins de tumbas a la vez.
+- El fork no ejecuta comprobaciones de actualizaciones, descargas autom\u00e1ticas ni
+  telemetr\u00eda externa. Los JAR se revisan y despliegan de forma controlada.
+
 ## Building
 
 Requirements: JDK 21 and Maven 3.8+.
 
 ```bash
-mvn -DskipTests package
+mvn clean test
+mvn package
 ```
 
-The shaded jar is produced at `target/AxGraves-<version>-Drake.jar`.
+The shaded jar is produced at `target/AxGraves-<version>-Drake-all.jar`.
 
 ## License
 
