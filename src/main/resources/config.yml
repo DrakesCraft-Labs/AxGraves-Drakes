@@ -141,10 +141,11 @@ blacklisted-items:
     name-contains: "Banned item's name"
 
 # what event priority should the plugin use? if everything is working, no need to touch this
-# however if the plugin is spawning graves without items, you can try setting this to lower values (lower = runs earlier)
+# Graves must observe the final death drops. Keep MONITOR when PvP or combat plugins
+# also mutate PlayerDeathEvent; lower priorities run earlier and can capture stale drops.
 # values: LOWEST, LOW, NORMAL, HIGH, HIGHEST, MONITOR
 # requires a restart to change
-death-listener-priority: HIGHEST
+death-listener-priority: MONITOR
 
 # settings for holograms displays
 holograms:

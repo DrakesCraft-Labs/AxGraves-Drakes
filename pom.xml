@@ -3,7 +3,7 @@
 
     <groupId>com.artillexstudios</groupId>
     <artifactId>AxGraves</artifactId>
-    <version>1.0-Drake</version>
+    <version>1.0-Drake.1</version>
     <packaging>jar</packaging>
 
     <name>AxGraves</name>
@@ -39,6 +39,9 @@
                         </goals>
                         <configuration>
                             <createDependencyReducedPom>false</createDependencyReducedPom>
+                            <!-- Keep the original artifact intact; this avoids in-place replacement failures on mounted workspaces. -->
+                            <shadedArtifactAttached>true</shadedArtifactAttached>
+                            <shadedClassifierName>all</shadedClassifierName>
                             <relocations>
                                 <relocation>
                                     <pattern>com.artillexstudios.axapi</pattern>
