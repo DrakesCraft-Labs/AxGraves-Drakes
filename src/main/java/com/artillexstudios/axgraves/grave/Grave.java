@@ -22,6 +22,8 @@ import com.artillexstudios.axgraves.utils.ExperienceUtils;
 import com.artillexstudios.axgraves.utils.InventoryUtils;
 import com.artillexstudios.axgraves.utils.LocationUtils;
 import com.artillexstudios.axgraves.utils.Utils;
+import com.artillexstudios.axgraves.hooks.SlimefunHook;
+import com.artillexstudios.axgraves.hooks.SoulboundRecoveryStore;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -65,6 +67,10 @@ public class Grave {
         items.removeIf(it -> {
             if (it == null) return true;
             if (BlacklistUtils.isBlacklisted(it)) return true;
+            if (SlimefunHook.isSoulbound(it)) {
+                SoulboundRecoveryStore.queue(offlinePlayer.getUniqueId(), it);
+                return true;
+            }
             return false;
         });
         items.replaceAll(ItemStack::clone); // clone all items

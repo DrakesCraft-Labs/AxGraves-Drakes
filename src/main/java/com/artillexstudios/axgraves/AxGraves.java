@@ -16,6 +16,7 @@ import com.artillexstudios.axgraves.grave.GravePlaceholders;
 import com.artillexstudios.axgraves.grave.SpawnedGraves;
 import com.artillexstudios.axgraves.migration.MoreGravesImporter;
 import com.artillexstudios.axgraves.hooks.SlimefunHook;
+import com.artillexstudios.axgraves.hooks.SoulboundRecoveryStore;
 import com.artillexstudios.axgraves.listeners.DeathListener;
 import com.artillexstudios.axgraves.listeners.PlayerInteractListener;
 import com.artillexstudios.axgraves.schedulers.SaveGraves;
@@ -62,6 +63,12 @@ public final class AxGraves extends AxPlugin {
         new DeathListener();
         SlimefunHook.init();
         getServer().getPluginManager().registerEvents(new PlayerInteractListener(), this);
+        getServer().getPluginManager().registerEvents(new org.bukkit.event.Listener() {
+            @org.bukkit.event.EventHandler
+            public void onJoin(org.bukkit.event.player.PlayerJoinEvent event) {
+                SoulboundRecoveryStore.restore(event.getPlayer());
+            }
+        }, this);
 
         CommandManager.load();
         GravePlaceholders.register();
