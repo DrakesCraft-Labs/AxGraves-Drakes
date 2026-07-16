@@ -7,29 +7,14 @@ import org.bukkit.entity.HumanEntity;
 
 import java.util.ArrayList;
 import java.util.Objects;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
-
-import static com.artillexstudios.axgraves.AxGraves.EXECUTOR;
 
 public class TickGraves {
-    private static ScheduledFuture<?> future = null;
-
     public static void start() {
-        if (future != null) future.cancel(true);
-
-        future = EXECUTOR.scheduleAtFixedRate(() -> {
-            try {
-                for (Grave grave : SpawnedGraves.getGraves()) {
-                    grave.update();
-                }
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-        }, 100, 100, TimeUnit.MILLISECONDS);
-
+        // Grave state contains Bukkit inventories and packet entities. Send each
+        // update to the Folia region that owns its location.
         Scheduler.get().runTimer(() -> {
             for (Grave grave : SpawnedGraves.getGraves()) {
+                Scheduler.get().runAt(grave.getLocation(), task -> grave.update());
                 for (HumanEntity viewer : new ArrayList<>(grave.getGui().getViewers())) {
                     if (!Objects.equals(viewer.getWorld(), grave.getLocation().getWorld())) {
                         grave.closeInventory(viewer);
@@ -39,11 +24,10 @@ public class TickGraves {
                     grave.closeInventory(viewer);
                 }
             }
-        }, 20, 20);
+        }, 2, 2);
     }
 
     public static void stop() {
-        if (future == null) return;
-        future.cancel(true);
+        // Scheduler tasks are owned by the plugin and are cancelled on disable.
     }
 }

@@ -1,6 +1,7 @@
 package com.artillexstudios.axgraves.commands.subcommands;
 
 import com.artillexstudios.axgraves.AxGraves;
+import com.artillexstudios.axapi.scheduler.Scheduler;
 import com.artillexstudios.axgraves.grave.Grave;
 import com.artillexstudios.axgraves.grave.GravePlaceholders;
 import com.artillexstudios.axgraves.grave.SpawnedGraves;
@@ -11,7 +12,6 @@ import org.bukkit.command.CommandSender;
 import java.util.Map;
 
 import static com.artillexstudios.axgraves.AxGraves.CONFIG;
-import static com.artillexstudios.axgraves.AxGraves.EXECUTOR;
 import static com.artillexstudios.axgraves.AxGraves.LANG;
 import static com.artillexstudios.axgraves.AxGraves.MESSAGEUTILS;
 
@@ -31,12 +31,12 @@ public enum Reload {
             return;
         }
 
-        EXECUTOR.execute(() -> {
-            for (Grave grave : SpawnedGraves.getGraves()) {
+        for (Grave grave : SpawnedGraves.getGraves()) {
+            Scheduler.get().runAt(grave.getLocation(), task -> {
                 grave.update();
                 grave.updateHologram();
-            }
-        });
+            });
+        }
 
         AxGraves.setDebugMode(CONFIG.getBoolean("debug", false));
         DeathListener.reload();
