@@ -21,10 +21,10 @@ instant-pickup-only-own: true
 
 # if you enable this, items will be taken away and stored in the grave on death, even if third party plugin tries to keep them
 # enabling this will also make the keep-inventory gamerule ineffective
-override-keep-inventory: false
+override-keep-inventory: true
 
 # if you enable this, xp levels will be taken away and stored in the grave on death, even if third party plugin tries to keep them
-override-keep-level: false
+override-keep-level: true
 
 # how high should grave holograms spawn?
 # only applies to new graves

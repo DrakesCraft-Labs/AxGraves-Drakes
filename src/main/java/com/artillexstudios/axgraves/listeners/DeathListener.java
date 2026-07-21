@@ -110,23 +110,27 @@ public class DeathListener implements Listener {
         if (storeItems) {
             boolean store = false;
 
-            if (!event.getKeepInventory()) {
-                store = true;
-                drops = copyNonSoulbound(event.getDrops());
-                // Leave Soulbound drops visible to Slimefun's own death listener.
-                event.getDrops().removeIf(item -> !SlimefunHook.isSoulbound(item));
-            } else if (overrideKeepInventory) {
-                store = true;
+            if (overrideKeepInventory) {
+                // Toma un snapshot antes de que otro listener pueda reescribir los drops.
                 ItemStack[] contents = player.getInventory().getContents();
+                store = true;
                 drops = copyNonSoulbound(Arrays.asList(contents));
 
-                // Preserve Soulbound items in their original slots and move only normal items.
+                // Nunca dejes copias no-Soulbound tanto en el evento como en la tumba.
+                event.getDrops().removeIf(item -> !SlimefunHook.isSoulbound(item));
+                event.setKeepInventory(true);
+
+                // Soulbound permanece en sus slots para que Slimefun conserve su propiedad.
                 for (int slot = 0; slot < contents.length; slot++) {
                     ItemStack item = contents[slot];
                     if (item != null && !SlimefunHook.isSoulbound(item)) {
                         player.getInventory().setItem(slot, null);
                     }
                 }
+            } else if (!event.getKeepInventory()) {
+                store = true;
+                drops = copyNonSoulbound(event.getDrops());
+                event.getDrops().removeIf(item -> !SlimefunHook.isSoulbound(item));
             }
 
             if (debug) LogUtils.debug("[{}] store: {} - drops size: {}", player.getName(), store, drops.size());
