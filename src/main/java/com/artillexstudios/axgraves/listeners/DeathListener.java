@@ -116,8 +116,9 @@ public class DeathListener implements Listener {
                 store = true;
                 drops = copyNonSoulbound(Arrays.asList(contents));
 
-                // Nunca dejes copias no-Soulbound tanto en el evento como en la tumba.
-                event.getDrops().removeIf(item -> !SlimefunHook.isSoulbound(item));
+                // The inventory retains Soulbound items while the grave owns every other item.
+                // Leaving any event drop here would duplicate it when keepInventory is enabled.
+                event.getDrops().clear();
                 event.setKeepInventory(true);
 
                 // Soulbound permanece en sus slots para que Slimefun conserve su propiedad.
