@@ -19,9 +19,9 @@ enable-instant-pickup: true
 # this makes it that only the owner of the grave will be able to instantly pick it up
 instant-pickup-only-own: true
 
-# if you enable this, items will be taken away and stored in the grave on death, even if third party plugin tries to keep them
-# enabling this will also make the keep-inventory gamerule ineffective
-override-keep-inventory: true
+# Respect keep-inventory set by protection or recovery plugins.
+# This prevents a protected death from retaining inventory and creating a grave.
+override-keep-inventory: false
 
 # if you enable this, xp levels will be taken away and stored in the grave on death, even if third party plugin tries to keep them
 override-keep-level: true
