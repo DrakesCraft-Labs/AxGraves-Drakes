@@ -147,6 +147,12 @@ blacklisted-items:
 # requires a restart to change
 death-listener-priority: MONITOR
 
+# Respawn at a newly created grave and grant a short recovery window.
+# This applies only when a grave actually exists; protected keep-inventory deaths are unchanged.
+grave-respawn:
+  enabled: true
+  invulnerability-seconds: 60
+
 # settings for holograms displays
 holograms:
   # set to 00000000 to make it invisible

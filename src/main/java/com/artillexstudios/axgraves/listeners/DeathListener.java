@@ -163,16 +163,18 @@ public class DeathListener implements Listener {
                 if (debug) LogUtils.debug("[{}] final keepInventory=true; no grave created", player.getName());
                 return;
             }
-            spawnGrave(player, graveLocation, graveDrops, graveExperience, debug);
+            if (spawnGrave(player, graveLocation, graveDrops, graveExperience, debug)) {
+                GraveRecoveryListener.queue(player, graveLocation);
+            }
         });
     }
 
-    private static void spawnGrave(Player player, Location location, List<ItemStack> drops, int xp, boolean debug) {
+    private static boolean spawnGrave(Player player, Location location, List<ItemStack> drops, int xp, boolean debug) {
         GravePreSpawnEvent gravePreSpawnEvent = new GravePreSpawnEvent(player, location);
         Bukkit.getPluginManager().callEvent(gravePreSpawnEvent);
         if (gravePreSpawnEvent.isCancelled()) {
             if (debug) LogUtils.debug("[{}] return: GravePreSpawnEvent cancelled", player.getName());
-            return;
+            return false;
         }
 
         Grave grave = new Grave(location, player, drops, xp, System.currentTimeMillis());
@@ -181,6 +183,7 @@ public class DeathListener implements Listener {
 
         GraveSpawnEvent graveSpawnEvent = new GraveSpawnEvent(player, grave);
         Bukkit.getPluginManager().callEvent(graveSpawnEvent);
+        return true;
     }
 
     /** Copies only grave-safe items; Soulbound ownership remains with Slimefun. */

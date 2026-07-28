@@ -18,6 +18,7 @@ import com.artillexstudios.axgraves.hooks.SlimefunHook;
 import com.artillexstudios.axgraves.hooks.SoulboundRecoveryStore;
 import com.artillexstudios.axgraves.listeners.DeathListener;
 import com.artillexstudios.axgraves.listeners.PlayerInteractListener;
+import com.artillexstudios.axgraves.listeners.GraveRecoveryListener;
 import com.artillexstudios.axgraves.schedulers.SaveGraves;
 import com.artillexstudios.axgraves.schedulers.TickGraves;
 
@@ -57,6 +58,7 @@ public final class AxGraves extends AxPlugin {
         new DeathListener();
         SlimefunHook.init();
         getServer().getPluginManager().registerEvents(new PlayerInteractListener(), this);
+        getServer().getPluginManager().registerEvents(new GraveRecoveryListener(), this);
         getServer().getPluginManager().registerEvents(new org.bukkit.event.Listener() {
             @org.bukkit.event.EventHandler
             public void onJoin(org.bukkit.event.player.PlayerJoinEvent event) {
