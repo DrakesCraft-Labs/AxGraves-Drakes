@@ -1,7 +1,9 @@
 package com.artillexstudios.axgraves.hooks;
 
 import org.bukkit.Bukkit;
+import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.Plugin;
 
 import java.lang.reflect.Method;
@@ -11,6 +13,7 @@ import java.util.logging.Level;
 
 public final class SlimefunHook {
 
+    private static final NamespacedKey ODYSSEIA_SOULBOUND = new NamespacedKey("odysseia", "soulbound");
     private static boolean enabled;
     private static Method soulboundMethod;
     private static final AtomicBoolean detectionFailureLogged = new AtomicBoolean();
@@ -44,9 +47,12 @@ public final class SlimefunHook {
     }
 
     public static boolean isSoulbound(ItemStack item) {
-        if (!enabled || item == null || item.getType().isAir()) {
+        if (item == null || item.getType().isAir()) {
             return false;
         }
+        // Odysseia kit gear is vanilla, so Slimefun cannot identify its marker.
+        if (isOdysseiaSoulbound(item)) return true;
+        if (!enabled) return false;
         if (soulboundMethod == null) {
             return true;
         }
@@ -56,6 +62,14 @@ public final class SlimefunHook {
             logDetectionFailure(ex);
             return true;
         }
+    }
+
+    /** Recognizes the canonical marker used by Odysseia VIP kits. */
+    static boolean isOdysseiaSoulbound(ItemStack item) {
+        if (!item.hasItemMeta()) return false;
+        Byte marker = item.getItemMeta().getPersistentDataContainer()
+                .get(ODYSSEIA_SOULBOUND, PersistentDataType.BYTE);
+        return marker != null && marker != 0;
     }
 
     static Method findSoulboundMethod(Class<?> utilsClass) throws NoSuchMethodException {
