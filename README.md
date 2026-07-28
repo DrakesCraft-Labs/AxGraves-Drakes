@@ -24,7 +24,7 @@ All options live in `plugins/AxGraves/config.yml` (auto-generated on first run).
 | `store-items` | `true` | Whether to move items into the grave. |
 | `store-xp` | `true` | Whether to store XP. |
 | `xp-keep-percentage` | `1.0` | Fraction of stored XP returned to the player. |
-| `override-keep-inventory` | `true` | Force-store items even when `keepInventory` is enabled. |
+| `override-keep-inventory` | `false` | Keep protected inventories authoritative; a grave is created only when the final death event does not retain items. |
 | `interact-only-own` | `false` | Restrict grave opening to the owner only. |
 | `disabled-worlds` | `[]` | Worlds where graves are not created. |
 | `blacklisted-death-causes` | `[]` | Death causes that skip grave creation (e.g. `VOID`). |

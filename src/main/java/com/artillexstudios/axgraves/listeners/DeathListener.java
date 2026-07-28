@@ -35,7 +35,7 @@ public class DeathListener implements Listener {
     public static void reload() {
         disabledWorlds = CONFIG.getStringList("disabled-worlds");
         blacklistedDeathCauses = CONFIG.getStringList("blacklisted-death-causes");
-        overrideKeepInventory = CONFIG.getBoolean("override-keep-inventory", true);
+        overrideKeepInventory = CONFIG.getBoolean("override-keep-inventory", false);
         overrideKeepLevel = CONFIG.getBoolean("override-keep-level", true);
         storeItems = CONFIG.getBoolean("store-items", true);
         storeXP = CONFIG.getBoolean("store-xp", true);
@@ -93,13 +93,6 @@ public class DeathListener implements Listener {
         Location location = player.getLocation();
         location.add(0, -0.5, 0);
         if (debug) LogUtils.debug("[{}] location moved to {}", player.getName(), location.toString());
-
-        final GravePreSpawnEvent gravePreSpawnEvent = new GravePreSpawnEvent(player, location);
-        Bukkit.getPluginManager().callEvent(gravePreSpawnEvent);
-        if (gravePreSpawnEvent.isCancelled()) {
-            if (debug) LogUtils.debug("[{}] return: GravePreSpawnEvent cancelled", player.getName());
-            return;
-        }
 
         if (debug) {
             LogUtils.debug("[{}] storeItems: {} - getKeepInventory: {} - overrideKeepInventory: {}", player.getName(), storeItems, event.getKeepInventory(), overrideKeepInventory);
@@ -159,11 +152,34 @@ public class DeathListener implements Listener {
             if (debug) LogUtils.debug("[{}] return: drops empty and xp is 0", player.getName());
             return;
         }
+        List<ItemStack> graveDrops = List.copyOf(drops);
+        Location graveLocation = location.clone();
+        int graveExperience = xp;
+
+        // Another MONITOR listener can still enable keepInventory after this listener runs.
+        // Deferring creation gives the final event state authority over every item type.
+        Bukkit.getScheduler().runTask(AxGraves.getInstance(), () -> {
+            if (!overrideKeepInventory && event.getKeepInventory()) {
+                if (debug) LogUtils.debug("[{}] final keepInventory=true; no grave created", player.getName());
+                return;
+            }
+            spawnGrave(player, graveLocation, graveDrops, graveExperience, debug);
+        });
+    }
+
+    private static void spawnGrave(Player player, Location location, List<ItemStack> drops, int xp, boolean debug) {
+        GravePreSpawnEvent gravePreSpawnEvent = new GravePreSpawnEvent(player, location);
+        Bukkit.getPluginManager().callEvent(gravePreSpawnEvent);
+        if (gravePreSpawnEvent.isCancelled()) {
+            if (debug) LogUtils.debug("[{}] return: GravePreSpawnEvent cancelled", player.getName());
+            return;
+        }
+
         Grave grave = new Grave(location, player, drops, xp, System.currentTimeMillis());
         SpawnedGraves.addGrave(grave);
         if (debug) LogUtils.debug("[{}] created and added grave", player.getName());
 
-        final GraveSpawnEvent graveSpawnEvent = new GraveSpawnEvent(player, grave);
+        GraveSpawnEvent graveSpawnEvent = new GraveSpawnEvent(player, grave);
         Bukkit.getPluginManager().callEvent(graveSpawnEvent);
     }
 
