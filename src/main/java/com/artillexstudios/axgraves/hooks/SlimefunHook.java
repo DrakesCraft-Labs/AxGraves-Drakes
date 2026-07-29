@@ -1,6 +1,7 @@
 package com.artillexstudios.axgraves.hooks;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
@@ -8,6 +9,7 @@ import org.bukkit.plugin.Plugin;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 
@@ -64,12 +66,20 @@ public final class SlimefunHook {
         }
     }
 
-    /** Recognizes the canonical marker used by Odysseia VIP kits. */
+    /** Recognizes current markers and the immutable lore carried by legacy VIP kit items. */
     static boolean isOdysseiaSoulbound(ItemStack item) {
         if (!item.hasItemMeta()) return false;
-        Byte marker = item.getItemMeta().getPersistentDataContainer()
+        var meta = item.getItemMeta();
+        Byte marker = meta.getPersistentDataContainer()
                 .get(ODYSSEIA_SOULBOUND, PersistentDataType.BYTE);
-        return marker != null && marker != 0;
+        if (marker != null && marker != 0) return true;
+
+        // VIP kits issued before the PDC marker used this exact lore. Preserve them
+        // without requiring players to claim a replacement kit or risk a grave loss.
+        List<String> lore = meta.getLore();
+        return lore != null && lore.stream()
+                .map(ChatColor::stripColor)
+                .anyMatch(line -> line != null && line.contains("[Vínculo Divino] Soulbound"));
     }
 
     static Method findSoulboundMethod(Class<?> utilsClass) throws NoSuchMethodException {
