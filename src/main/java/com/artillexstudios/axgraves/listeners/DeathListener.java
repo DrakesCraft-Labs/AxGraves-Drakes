@@ -177,7 +177,9 @@ public class DeathListener implements Listener {
             return false;
         }
 
-        Grave grave = new Grave(location, player, drops, xp, System.currentTimeMillis());
+        // Soulbound items are intentionally excluded from this normal-death grave.
+        // They remain under Slimefun ownership and must never enter recovery storage.
+        Grave grave = new Grave(location, player, drops, xp, System.currentTimeMillis(), false);
         SpawnedGraves.addGrave(grave);
         if (debug) LogUtils.debug("[{}] created and added grave", player.getName());
 

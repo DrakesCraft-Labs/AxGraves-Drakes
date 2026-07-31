@@ -63,12 +63,24 @@ public class Grave {
     private boolean removed = false;
 
     public Grave(Location loc, @NotNull OfflinePlayer offlinePlayer, @NotNull List<ItemStack> items, int storedXP, long date) {
+        this(loc, offlinePlayer, items, storedXP, date, true);
+    }
+
+    /**
+     * Builds a grave while keeping Soulbound recovery separate from normal deaths.
+     * A normal death already leaves Soulbound ownership with Slimefun, so queuing
+     * it again would create a second copy when the player reconnects.
+     */
+    public Grave(Location loc, @NotNull OfflinePlayer offlinePlayer, @NotNull List<ItemStack> items,
+            int storedXP, long date, boolean recoverSoulbound) {
         items = new ArrayList<>(items);
         items.removeIf(it -> {
             if (it == null) return true;
             if (BlacklistUtils.isBlacklisted(it)) return true;
             if (SlimefunHook.isSoulbound(it)) {
-                SoulboundRecoveryStore.queue(offlinePlayer.getUniqueId(), it);
+                if (recoverSoulbound) {
+                    SoulboundRecoveryStore.queue(offlinePlayer.getUniqueId(), it);
+                }
                 return true;
             }
             return false;
