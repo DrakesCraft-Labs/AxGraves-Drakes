@@ -54,6 +54,7 @@ public final class SlimefunHook {
         }
         // Odysseia kit gear is vanilla, so Slimefun cannot identify its marker.
         if (isOdysseiaSoulbound(item)) return true;
+        if (hasExternalSoulboundMarker(item)) return true;
         if (!enabled) return false;
         if (soulboundMethod == null) {
             return true;
@@ -80,6 +81,26 @@ public final class SlimefunHook {
         return lore != null && lore.stream()
                 .map(ChatColor::stripColor)
                 .anyMatch(line -> line != null && line.contains("[Vínculo Divino] Soulbound"));
+    }
+
+    /**
+     * Covers compatible addons that use their own namespace for a Soulbound PDC
+     * marker or expose the enchantment through a lore line instead of Slimefun's API.
+     */
+    static boolean hasExternalSoulboundMarker(ItemStack item) {
+        if (!item.hasItemMeta()) return false;
+        var meta = item.getItemMeta();
+        boolean pdcMarker = meta.getPersistentDataContainer().getKeys().stream()
+                .anyMatch(key -> key.getKey().equalsIgnoreCase("soulbound"));
+        if (pdcMarker) return true;
+
+        List<String> lore = meta.getLore();
+        return lore != null && lore.stream()
+                .map(ChatColor::stripColor)
+                .filter(line -> line != null)
+                .map(String::trim)
+                .anyMatch(line -> line.equalsIgnoreCase("soulbound")
+                        || line.toLowerCase(java.util.Locale.ROOT).startsWith("soulbound "));
     }
 
     static Method findSoulboundMethod(Class<?> utilsClass) throws NoSuchMethodException {
