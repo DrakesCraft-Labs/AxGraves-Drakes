@@ -23,6 +23,10 @@ instant-pickup-only-own: true
 # This prevents a protected death from retaining inventory and creating a grave.
 override-keep-inventory: false
 
+# Keep Slimefun Soulbound items in the player's inventory while other items go to the grave.
+# This is per-item keepInventory and prevents Soulbound from becoming a grave duplicate.
+preserve-soulbound-in-inventory: true
+
 # if you enable this, xp levels will be taken away and stored in the grave on death, even if third party plugin tries to keep them
 override-keep-level: true
 
