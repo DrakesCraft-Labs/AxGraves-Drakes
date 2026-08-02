@@ -4,7 +4,7 @@ main: com.artillexstudios.axgraves.AxGraves
 api-version: '1.21'
 folia-supported: true
 author: Chagui68
-website: https://github.com/Chagui68/AxGraves-Drakes
+website: https://github.com/DrakesCraft-Labs/AxGraves-Drakes
 softdepend:
   - Slimefun
 
