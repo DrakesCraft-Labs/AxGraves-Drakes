@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="https://raw.githubusercontent.com/DrakesCraft-Labs/AxGraves-Drakes/master/banner.svg" width="100%" alt="AXGRAVES animated banner" />
+</p>
+
 # AxGraves Drake
 
 > Estado: preparado para Paper/Purpur 1.21.11 y Java 21. El artefacto se valida
@@ -110,3 +114,4 @@ This project is licensed under the **GNU General Public License v3.0**. See [`LI
 for the full text.
 
 Based on the original `AxGraves` plugin by Artillex-Studios; modified under the terms of GPLv3.
+
