@@ -52,6 +52,35 @@ public class SpawnedGraves {
 
     public static void removeGrave(Grave grave) {
         graves.remove(grave);
+        persistirTrasCambio();
+    }
+
+    /**
+     * Vuelca las tumbas a disco en cuanto una desaparece.
+     *
+     * Quitar la tumba solo la sacaba de la lista en memoria: el fichero seguia teniendo la tumba
+     * con sus objetos hasta que saltara el guardado periodico, treinta segundos despues. Si el
+     * servidor moria de golpe en esa ventana -- una caida, o el watchdog matando el proceso, que
+     * ya ha pasado -- al arrancar se restauraba una tumba ya saqueada y sus objetos aparecian
+     * duplicados, porque el jugador se los habia llevado antes. El apagado limpio si guardaba, asi
+     * que el fallo solo se veia en cierres forzados y por eso costaba reproducirlo.
+     *
+     * Se escribe en el ejecutor del plugin para no bloquear el hilo principal, y solo cuando el
+     * guardado de tumbas esta activado.
+     */
+    private static void persistirTrasCambio() {
+        if (!AxGraves.CONFIG.getBoolean("save-graves.enabled", true)) return;
+        try {
+            AxGraves.EXECUTOR.submit(() -> {
+                try {
+                    saveToFile();
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            });
+        } catch (Exception ignored) {
+            // El ejecutor ya esta cerrado (apagado en curso): disable() se encarga de guardar.
+        }
     }
 
     public static ConcurrentLinkedQueue<Grave> getGraves() {
