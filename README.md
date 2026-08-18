@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/DrakesCraft-Labs/AxGraves-Drakes/master/banner.svg" width="100%" alt="AXGRAVES animated banner" />
+  <img src="https://raw.githubusercontent.com/DrakesCraft-Labs/AxGraves-Drakes/main/banner.svg" width="100%" alt="AXGRAVES animated banner" />
 </p>
 
 # AxGraves Drake
