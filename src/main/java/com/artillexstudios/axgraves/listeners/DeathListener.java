@@ -7,6 +7,7 @@ import com.artillexstudios.axgraves.api.events.GraveSpawnEvent;
 import com.artillexstudios.axgraves.grave.Grave;
 import com.artillexstudios.axgraves.grave.SpawnedGraves;
 import com.artillexstudios.axgraves.hooks.SlimefunHook;
+import com.artillexstudios.axgraves.hooks.SoulboundRecoveryStore;
 import com.artillexstudios.axgraves.utils.ExperienceUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -101,40 +102,28 @@ public class DeathListener implements Listener {
             LogUtils.debug("[{}] storeXP: {} - getKeepLevel: {} - overrideKeepLevel: {}", player.getName(), storeXP, event.getKeepLevel(), overrideKeepLevel);
         }
 
+        // Si keepInventory está activo (por rango Zeus, región de ProtectionStones/WorldGuard o gamerule),
+        // NUNCA creamos tumba para evitar duplicaciones.
+        if (event.getKeepInventory()) {
+            if (debug) LogUtils.debug("[{}] return: keepInventory is true, no grave needed", player.getName());
+            return;
+        }
+
         List<ItemStack> drops = new ArrayList<>();
-        boolean managedInventory = false;
         if (storeItems) {
-            boolean store = false;
-
-            if (!overrideKeepInventory && event.getKeepInventory()) {
-                // A protection/recovery plugin owns this death. Do not alter its inventory.
-                store = false;
-            } else if (overrideKeepInventory || preserveSoulbound) {
-                // Toma un snapshot antes de que otro listener pueda reescribir los drops.
-                ItemStack[] contents = player.getInventory().getContents();
-                store = true;
-                managedInventory = true;
-                drops = copyNonSoulbound(Arrays.asList(contents));
-
-                // Keep only Soulbound items in the inventory; the grave owns every other item.
-                // Clearing event drops prevents a second copy when keepInventory is enabled.
-                event.getDrops().clear();
-                event.setKeepInventory(true);
-
-                // Soulbound permanece en sus slots como keepInventory por objeto.
-                for (int slot = 0; slot < contents.length; slot++) {
-                    ItemStack item = contents[slot];
-                    if (item != null && !SlimefunHook.isSoulbound(item)) {
-                        player.getInventory().setItem(slot, null);
-                    }
+            List<ItemStack> eventDrops = new ArrayList<>(event.getDrops());
+            for (ItemStack item : eventDrops) {
+                if (item == null || item.getType().isAir()) continue;
+                if (SlimefunHook.isSoulbound(item)) {
+                    SoulboundRecoveryStore.queue(player.getUniqueId(), item);
+                } else {
+                    drops.add(item.clone());
                 }
-            } else if (!event.getKeepInventory()) {
-                store = true;
-                drops = copyNonSoulbound(event.getDrops());
-                event.getDrops().removeIf(item -> !SlimefunHook.isSoulbound(item));
             }
+            // Limpiamos los drops para que no caigan al suelo ni se dupliquen
+            event.getDrops().clear();
 
-            if (debug) LogUtils.debug("[{}] store: {} - drops size: {}", player.getName(), store, drops.size());
+            if (debug) LogUtils.debug("[{}] store: true - grave drops size: {}", player.getName(), drops.size());
         }
 
         int xp = 0;
@@ -162,12 +151,9 @@ public class DeathListener implements Listener {
         List<ItemStack> graveDrops = List.copyOf(drops);
         Location graveLocation = location.clone();
         int graveExperience = xp;
-        final boolean axGravesManagedInventory = managedInventory;
 
-        // Another MONITOR listener can still enable keepInventory after this listener runs.
-        // Deferring creation gives the final event state authority over every item type.
         Bukkit.getScheduler().runTask(AxGraves.getInstance(), () -> {
-            if (!overrideKeepInventory && event.getKeepInventory() && !axGravesManagedInventory) {
+            if (!overrideKeepInventory && event.getKeepInventory()) {
                 if (debug) LogUtils.debug("[{}] final keepInventory=true; no grave created", player.getName());
                 return;
             }

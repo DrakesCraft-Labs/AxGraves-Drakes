@@ -64,6 +64,13 @@ public final class AxGraves extends AxPlugin {
             public void onJoin(org.bukkit.event.player.PlayerJoinEvent event) {
                 SoulboundRecoveryStore.restore(event.getPlayer());
             }
+
+            @org.bukkit.event.EventHandler
+            public void onRespawn(org.bukkit.event.player.PlayerRespawnEvent event) {
+                org.bukkit.Bukkit.getScheduler().runTask(AxGraves.getInstance(), () -> {
+                    SoulboundRecoveryStore.restore(event.getPlayer());
+                });
+            }
         }, this);
 
         CommandManager.load();
